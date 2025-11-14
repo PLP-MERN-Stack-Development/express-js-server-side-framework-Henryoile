@@ -4,6 +4,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { v4: uuidv4 } = require('uuid');
+const productRoutes = require('./routes/products');
+const logger = require('./middleware/logger');
+const auth = require('./middleware/auth');
 
 // Initialize Express app
 const app = express();
@@ -11,6 +14,8 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware setup
 app.use(bodyParser.json());
+app.use(logger);
+app.use(auth);
 
 // Sample in-memory products database
 let products = [
@@ -61,6 +66,13 @@ app.get('/api/products', (req, res) => {
 // - Request logging
 // - Authentication
 // - Error handling
+
+// Mount product routes
+app.use('/api/products', productRoutes);
+
+// Error handling middleware
+const errorHandler = require('./middleware/errorHandler');
+app.use(errorHandler);
 
 // Start the server
 app.listen(PORT, () => {
